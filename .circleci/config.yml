@@ -1,0 +1,41 @@
+version: 2.0
+
+jobs:
+  build:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/circleci-demo-workflows
+    steps:
+      - checkout
+      - run: uname -a
+      - run: sudo apt-get install -y libx11-xcb1 libxrandr2 libasound2 libpangocairo-1.0-0 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libnss3 libxss1
+      - run: sudo apt-get install fonts-wqy-zenhei
+      # Run nodejs script
+      - run: npm install
+      - run: node index.js
+      - run: git version
+      - run: git status
+      - run: git config --global user.email "1639301503@qq.com"
+      - run: git config --global user.name "jwenjian"
+      - run: git add .
+      - run: git commit -m "Update From Circle CI"
+      - run: git push https://$GITHUB_LOGIN:$GITHUB_PASSWORD@github.com/$GITHUB_LOGIN/cloud-fans.git
+      - run: echo 'done'
+
+workflows:
+  version: 2
+  scheduled-workflow:
+    jobs:
+        - build
+    triggers:
+      - schedule:
+          cron: "0 * * * *"
+          filters:
+            branches:
+              only: master
+  # commit-workflow:
+  #   jobs:
+  #     - build:
+  #         filters:
+  #           branches:
+  #             only: master
