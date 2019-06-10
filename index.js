@@ -72,8 +72,8 @@ const oss_client = new OSS({
     // to scroll the right side to make owner's text scroll into the view.
     await new_page.evaluate(() => document.querySelector('article > div > div > ul > li').scrollIntoView());
 
-    if (!fs.exists(curr_user)) {
-      fs.mkdir(curr_user);
+    if (!fs.existsSync(curr_user)) {
+      fs.mkdirSync(curr_user);
     }
     // do screenshot
     let pngpath = curr_user + '/latest.png';
