@@ -24,18 +24,18 @@ jobs:
 
 workflows:
   version: 2
-  scheduled-workflow:
-    jobs:
-        - build
-    triggers:
-      - schedule:
-          cron: "0 * * * *"
-          filters:
-            branches:
-              only: master
-  # commit-workflow:
+  # scheduled-workflow:
   #   jobs:
-  #     - build:
+  #       - build
+  #   triggers:
+  #     - schedule:
+  #         cron: "0 * * * *"
   #         filters:
   #           branches:
   #             only: master
+  commit-workflow:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: master
