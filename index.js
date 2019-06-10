@@ -6,7 +6,8 @@ const oss_client = new OSS({
   region: process.env.OSS_REGION,
   accessKeyId: process.env.OSS_ACCESS_KEY_ID,
   accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET,
-  bucket: process.env.OSS_BUCKET
+  bucket: process.env.OSS_BUCKET,
+  timeout: 300
 });
 
 (async () => {
