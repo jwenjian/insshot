@@ -57,6 +57,13 @@ const oss_client = new OSS({
     let href_handle = await first_post.getProperty('href')
     let href = await href_handle.jsonValue();
 
+    // check if is the same one with last shot
+    let saved_link = db['last_saved_link'][curr_user];
+    if (saved_link && href === saved_link) {
+      console.log(`${curr_user}  ${href} already saved, skip for current job`);
+      continue;
+    }
+
     // each post have its own page
     let new_page = await browser.newPage();
     await new_page.goto(href, {
@@ -91,7 +98,13 @@ const oss_client = new OSS({
 
     content += curr_user_content;
 
+    // save to ali oss
     await put(curr_user, 'latest', false);
+
+    // save link to db
+    db['last_saved_link'][curr_user] = href;
+
+    await save_db(db);
   }
 
   // update README
@@ -99,6 +112,13 @@ const oss_client = new OSS({
 
   await browser.close();
 })();
+
+async function save_db(db_obj) {
+  let db_str = JSON.stringify(db_obj, null, 2);
+  fs.writeFileSync('db.json', db_str, err => {
+    console.error('save db failed');
+  })
+}
 
 async function put(username, filename, del_after_upload) {
   let filepath = username + '/' + filename + '.png';
