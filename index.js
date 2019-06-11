@@ -57,6 +57,17 @@ const oss_client = new OSS({
     let href_handle = await first_post.getProperty('href')
     let href = await href_handle.jsonValue();
 
+    // do screenshot
+    let pngpath = curr_user + '/latest.png';
+
+    curr_user_content += `
+
+![${curr_user}](${pngpath}?raw=true)
+
+        `;
+
+    content += curr_user_content;
+
     // check if is the same one with last shot
     let saved_link = db['last_saved_link'][curr_user];
     if (saved_link && href === saved_link) {
@@ -82,21 +93,11 @@ const oss_client = new OSS({
     if (!fs.existsSync(curr_user)) {
       fs.mkdirSync(curr_user);
     }
-    // do screenshot
-    let pngpath = curr_user + '/latest.png';
 
     await article.screenshot({
       path: pngpath
     })
     console.log(pngpath);
-
-    curr_user_content += `
-
-![${curr_user}](${pngpath}?raw=true)
-
-        `;
-
-    content += curr_user_content;
 
     // save to ali oss
     await put(curr_user, 'latest', false);
