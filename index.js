@@ -19,10 +19,7 @@ const github_client = new Octokit({
     defaultViewport: {
       width: 1920,
       height: 1080
-    },
-    args: [
-      '--proxy-server=127.0.0.1:1080'
-    ]
+    }
   });
 
   const now = new Date();
