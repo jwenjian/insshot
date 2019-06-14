@@ -8,13 +8,21 @@ const oss_client = new OSS({
   accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET,
   bucket: process.env.OSS_BUCKET
 });
+const Octokit = require('@octokit/rest');
+const github_client = new Octokit({
+  auth: process.env.GITHUB_TOKEN
+});
+
 
 (async () => {
   const browser = await puppeteer.launch({
     defaultViewport: {
       width: 1920,
       height: 1080
-    }
+    },
+    args: [
+      '--proxy-server=127.0.0.1:1080'
+    ]
   });
 
   const now = new Date();
@@ -22,13 +30,23 @@ const oss_client = new OSS({
   // build README.md content
   let content = `
   
- > 上次更新: ${now.toDateString()} ${now.toTimeString()} 
+ 上次更新: ${now.toDateString()} ${now.toTimeString()} 
 
+ > 仅显示一小时内更新的post, [更多...](screenshots/)
   `;
 
+  // get labels from insshot repository
+  let users = await github_client.issues.listLabelsForRepo({
+    owner: 'jwenjian',
+    repo: 'insshot'
+  });
+
+  
+  console.log(users);
+
   // iterrate the users in db
-  for (let i = 0; i < db.users.length; i++) {
-    let curr_user = db.users[i];
+  for (let i = 0; i < users.data.length; i++) {
+    let curr_user = users.data[i].name;
 
     // each user have its own page
     const page = await browser.newPage();
@@ -58,7 +76,7 @@ const oss_client = new OSS({
     let href = await href_handle.jsonValue();
 
     // do screenshot
-    let pngpath = curr_user + '/latest.png';
+    let pngpath = 'screenshots/' + curr_user + '/latest.png';
 
     curr_user_content += `
 
@@ -66,14 +84,15 @@ const oss_client = new OSS({
 
         `;
 
-    content += curr_user_content;
-
     // check if is the same one with last shot
     let saved_link = db['last_saved_link'][curr_user];
     if (saved_link && href === saved_link) {
       console.log(`${curr_user}  ${href} already saved, skip for current job`);
       continue;
     }
+
+    // only show new post in last hour
+    content += curr_user_content;
 
     // each post have its own page
     let new_page = await browser.newPage();
@@ -90,8 +109,8 @@ const oss_client = new OSS({
     // to scroll the right side to make owner's text scroll into the view.
     await new_page.evaluate(() => document.querySelector('article > div > div > ul > li').scrollIntoView());
 
-    if (!fs.existsSync(curr_user)) {
-      fs.mkdirSync(curr_user);
+    if (!fs.existsSync('screenshots/' + curr_user)) {
+      fs.mkdirSync('screenshots/' + curr_user);
     }
 
     await article.screenshot({
@@ -122,7 +141,7 @@ async function save_db(db_obj) {
 }
 
 async function put(username, filename, del_after_upload) {
-  let filepath = username + '/' + filename + '.png';
+  let filepath = 'screenshots/' + username + '/' + filename + '.png';
 
   try {
     let result = await oss_client.put(filepath, filepath);
