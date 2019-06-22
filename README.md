@@ -1,15 +1,15 @@
 
   
- 上次更新: Sat Jun 22 2019 01:00:34 GMT+0000 (Coordinated Universal Time) 
+ 上次更新: Sat Jun 22 2019 02:00:31 GMT+0000 (Coordinated Universal Time) 
 
  > 仅显示一小时内更新的post, [更多...](screenshots/)
   
-# [tanaka_tatsuya](https://www.instagram.com/tanaka_tatsuya/)
+# [jaychou](https://www.instagram.com/jaychou/)
 
 最新:
 
     
 
-![tanaka_tatsuya](screenshots/tanaka_tatsuya/latest.png?raw=true)
+![jaychou](screenshots/jaychou/latest.png?raw=true)
 
         
